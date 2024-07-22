@@ -7,6 +7,7 @@ parser.add_argument("-i", "--initial", type=int, help="initial value of the attr
 parser.add_argument("-a", "--attribute", type=ascii, help="name of the counter attribute", default="n")
 parser.add_argument("-r", "--rectoverso", action="store_true", help="only for pb tag, add recto/verso to number, starting with recto")
 parser.add_argument("-v", "--versorecto", action="store_true", help="only for pb tag, add recto/verso to number, starting with verso")
+parser.add_argument("-s", "--restart", type=ascii, help="restart numbering after this tag")
 parser.add_argument("-t", "--root", type=ascii, help="root tag, default TEI")
 parser.add_argument("src", type=open, help="Source file")
 parser.add_argument("tag", help="XML tag to which add number")
@@ -32,6 +33,7 @@ count = config["initial"]
 counter_tag = config["attribute"][1:-1]
 rectoverso = config["rectoverso"] | config["versorecto"]
 r_tag = config["root"]
+l_tag = config["restart"]
 
 # check root tag
 if r_tag is not None:
@@ -75,6 +77,22 @@ elif (c_tag == "lb"): # count restart at each pb
 			count += 1
 		# delete temp attibute
 		del item.attrib[temp_att]
+elif (l_tag is not None): # count restart at each l_tag
+	# add temp attibute
+	temp_att = "xyzMyTag"
+	for tag in [c_tag, l_tag]:
+		for item in root.iter(prefix+tag):
+			item.set(temp_att, "n")
+	# add n attibute and delete temp attibute
+	count = 1
+	for item in root.findall('.//*[@'+temp_att+']'):
+		if(item.tag == prefix+l_tag):
+			count = 1
+		elif(item.tag == prefix+c_tag):
+			item.set(counter_tag, str(count))
+			count += 1
+		# delete temp attibute
+		del item.attrib[temp_att]
 else: # common case
 	for item in root.iter(TAG):
 		item.set(counter_tag, str(count))
@@ -82,6 +100,6 @@ else: # common case
 		
 # write output file
 with open(config["dest"], 'wb') as f:
-    tree.write(f)
+    tree.write(f, pretty_print = True, xml_declaration=True, encoding="utf-8")
 
 exit(0)

@@ -3,7 +3,9 @@
 ### Python scripts
 
 - `add_id.py`: add `@xml:id` values to specified elements automatically
+- `add_id.ipynb`: add `@xml:id` values to specified elements automatically (notebook vesion)
 - `add_number.py`: add `@n` values to specified elements automatically
+- `add_number.ipynb`: add `@n` values to specified elements automatically (notebook vesion)
 - `extract_measurements_from_tei.py`: extracts textual table values and adds them as attributes
 
 ### XSLT scripts
